@@ -6,10 +6,6 @@
 **Date:** November 19, 2025
 
 ---
-
-
-
-
 ## Table of Contents
 
 1. [Overview](#overview)

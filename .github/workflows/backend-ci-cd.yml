@@ -35,14 +35,7 @@ jobs:
           key: ${{ secrets.DEPLOY_KEY }}
           source: "./"
           target: ${{ secrets.DEPLOY_PATH }}
-          exclude: |
-            .git*
-            venv
-            media
-            db.sqlite3
-            .github
-            .vscode
-            .idea
+          rm: true
 
       - name: Install dependencies and migrate on remote
         uses: appleboy/ssh-action@master
