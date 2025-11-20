@@ -1,0 +1,64 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  test-and-deploy:
+    name: Test backend and deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run backend tests
+        run: python manage.py test
+
+      - name: Deploy files to remote backend
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          source: "./"
+          target: ${{ secrets.DEPLOY_PATH }}
+          exclude: |
+            .git*
+            venv
+            media
+            db.sqlite3
+            .github
+            .vscode
+            .idea
+
+      - name: Install dependencies and migrate on remote
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+            cd ${{ secrets.DEPLOY_PATH }}
+            if [ ! -d venv ]; then
+              python3 -m venv venv
+            fi
+            . venv/bin/activate
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            python manage.py migrate --noinput
+            mkdir -p media
