@@ -83,13 +83,15 @@ backend/
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and set your configurations, especially the PostgreSQL credentials (or leave `DB_ENGINE` set to `django.db.backends.sqlite3` if you prefer SQLite for local dev):
+   You can duplicate the supplied files to gate each environment explicitly:
+   - Copy `.env.development` for your local machine (SQLite + console email delivery).
+   - Copy `.env.production` when deploying with PostgreSQL and SMTP credentials.
+   Update whichever file you load with:
    - `SECRET_KEY`: Generate a secure secret key
-   - `DEBUG`: Set to `False` in production
+   - `DEBUG`: `True` for dev, `False` for prod
    - `ALLOWED_HOSTS`: Add your domain names
-   - `DB_ENGINE`: `django.db.backends.postgresql` (or `django.db.backends.sqlite3`)
-   - `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`: PostgreSQL connection details
-   - Email settings for production
+   - `DB_ENGINE`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`: database details
+   - Email settings for the environment you are configuring
 
 6. **Run migrations**
    ```bash
