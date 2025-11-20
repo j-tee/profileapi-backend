@@ -20,7 +20,7 @@ A professional Django REST API for managing personal portfolio data with authent
 - **API**: Django REST Framework 3.15.2
 - **Authentication**: JWT (djangorestframework-simplejwt)
 - **MFA**: PyOTP + QR Code generation
-- **Database**: SQLite (default) - PostgreSQL/MySQL compatible
+- **Database**: PostgreSQL (configured via env vars, falls back to SQLite for local dev)
 - **Documentation**: drf-spectacular (OpenAPI 3.0)
 - **Image Processing**: Pillow
 - **CORS**: django-cors-headers
@@ -83,11 +83,12 @@ backend/
    ```bash
    cp .env.example .env
    ```
-   Edit `.env` and set your configurations:
+   Edit `.env` and set your configurations, especially the PostgreSQL credentials (or leave `DB_ENGINE` set to `django.db.backends.sqlite3` if you prefer SQLite for local dev):
    - `SECRET_KEY`: Generate a secure secret key
-   - `DEBUG`: Set to False in production
+   - `DEBUG`: Set to `False` in production
    - `ALLOWED_HOSTS`: Add your domain names
-   - `DATABASE_URL`: Configure your database
+   - `DB_ENGINE`: `django.db.backends.postgresql` (or `django.db.backends.sqlite3`)
+   - `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`: PostgreSQL connection details
    - Email settings for production
 
 6. **Run migrations**
@@ -309,8 +310,13 @@ SECRET_KEY=your-secret-key-here
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
-# Database
-DATABASE_URL=sqlite:///db.sqlite3
+# Database (PostgreSQL settings shown; set DB_ENGINE=django.db.backends.sqlite3 to fall back)
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=portfolio_db
+DB_USER=portfolio_user
+DB_PASSWORD=strongpassword
+DB_HOST=localhost
+DB_PORT=5432
 
 # CORS
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
