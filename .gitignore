@@ -31,6 +31,15 @@ env.bak/
 venv.bak/
 .venv/
 
+# Deployment keys
+deploy_key
+deploy_key.pub
+
+# Standalone test scripts (not Django tests)
+test_admin_login.py
+create_superuser.py
+manage_users.py
+
 # Django
 *.log
 local_settings.py
