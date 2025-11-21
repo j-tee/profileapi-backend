@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",  # Must be before other apps that reference User
     "contacts",
-    "profiles",
     "experiences",
     "education",
     "skills",

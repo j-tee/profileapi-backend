@@ -14,7 +14,7 @@ class ProjectImageInline(admin.TabularInline):
 class ProjectAdmin(admin.ModelAdmin):
     """Admin interface for projects"""
     list_display = [
-        'title', 'profile', 'role', 'start_date', 'end_date', 
+        'title', 'user', 'role', 'start_date', 'end_date', 
         'current', 'featured', 'order', 'created_at'
     ]
     list_filter = ['featured', 'current', 'start_date', 'created_at']
@@ -25,7 +25,7 @@ class ProjectAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('id', 'profile', 'title', 'description', 'long_description')
+            'fields': ('id', 'user', 'title', 'description', 'long_description')
         }),
         ('Project Details', {
             'fields': (

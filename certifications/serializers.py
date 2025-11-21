@@ -25,23 +25,30 @@ class CertificationListSerializer(serializers.ModelSerializer):
 
 class CertificationDetailSerializer(serializers.ModelSerializer):
     """Serializer for certification details (complete data)"""
-    profile_name = serializers.SerializerMethodField()
+    owner_name = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
     is_active = serializers.BooleanField(read_only=True)
     
     class Meta:
         model = Certification
         fields = [
-            'id', 'profile', 'profile_name', 'name', 'issuer',
+            'id', 'user', 'owner_name', 'owner_email', 'name', 'issuer',
             'issue_date', 'expiration_date', 'is_active',
             'credential_id', 'credential_url', 'description',
             'skills', 'order', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'profile_name']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'owner_name', 'owner_email']
     
-    def get_profile_name(self, obj):
-        """Get profile owner name"""
-        if obj.profile:
-            return obj.profile.full_name
+    def get_owner_name(self, obj):
+        """Get certification owner name"""
+        if obj.user:
+            return obj.user.get_full_name()
+        return None
+    
+    def get_owner_email(self, obj):
+        """Get certification owner email"""
+        if obj.user:
+            return obj.user.email
         return None
 
 
@@ -51,7 +58,7 @@ class CertificationCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certification
         fields = [
-            'profile', 'name', 'issuer', 'issue_date',
+            'user', 'name', 'issuer', 'issue_date',
             'expiration_date', 'credential_id', 'credential_url',
             'description', 'skills', 'order'
         ]

@@ -40,17 +40,18 @@ class EducationListSerializer(serializers.ModelSerializer):
 class EducationDetailSerializer(serializers.ModelSerializer):
     """Serializer for education details (complete data)"""
     duration = serializers.SerializerMethodField()
-    profile_name = serializers.SerializerMethodField()
+    owner_name = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
     
     class Meta:
         model = Education
         fields = [
-            'id', 'profile', 'profile_name', 'institution', 'degree',
+            'id', 'user', 'owner_name', 'owner_email', 'institution', 'degree',
             'field_of_study', 'start_date', 'end_date', 'current',
             'grade', 'description', 'activities', 'achievements',
             'order', 'duration', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'profile_name']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'owner_name', 'owner_email']
     
     def get_duration(self, obj):
         """Calculate education duration"""
@@ -67,10 +68,16 @@ class EducationDetailSerializer(serializers.ModelSerializer):
             return f"{years} years"
         return None
     
-    def get_profile_name(self, obj):
-        """Get profile owner name"""
-        if obj.profile:
-            return obj.profile.full_name
+    def get_owner_name(self, obj):
+        """Get education owner name"""
+        if obj.user:
+            return obj.user.get_full_name()
+        return None
+    
+    def get_owner_email(self, obj):
+        """Get education owner email"""
+        if obj.user:
+            return obj.user.email
         return None
 
 
@@ -80,7 +87,7 @@ class EducationCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = [
-            'profile', 'institution', 'degree', 'field_of_study',
+            'user', 'institution', 'degree', 'field_of_study',
             'start_date', 'end_date', 'current', 'grade',
             'description', 'activities', 'achievements', 'order'
         ]

@@ -34,11 +34,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     - delete_image: DELETE /api/projects/{id}/delete_image/{image_id}/ - Delete project image
     - reorder_images: POST /api/projects/{id}/reorder_images/ - Reorder project images
     """
-    queryset = Project.objects.select_related('profile').prefetch_related('images').all()
+    queryset = Project.objects.select_related('user').prefetch_related('images').all()
     permission_classes = [IsAuthenticatedOrReadOnly, IsSuperAdminOrEditor]
     parser_classes = [JSONParser, MultiPartParser, FormParser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['featured', 'current', 'profile']
+    filterset_fields = ['featured', 'current', 'user']
     search_fields = ['title', 'description', 'long_description', 'technologies', 'role']
     ordering_fields = ['start_date', 'created_at', 'order', 'title']
     ordering = ['-featured', '-start_date']
@@ -61,10 +61,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         """List all projects with filtering and search"""
         queryset = self.filter_queryset(self.get_queryset())
         
-        # Filter by profile if provided
-        profile_id = request.query_params.get('profile')
-        if profile_id:
-            queryset = queryset.filter(profile__id=profile_id)
+        # Filter by user if provided
+        user_id = request.query_params.get('user')
+        if user_id:
+            queryset = queryset.filter(user__id=user_id)
         
         # Filter featured only
         featured_only = request.query_params.get('featured_only')
@@ -167,10 +167,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = ProjectListSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
     
-    @action(detail=False, methods=['get'], url_path='by_profile/(?P<profile_id>[^/.]+)')
-    def by_profile(self, request, profile_id=None):
-        """Get all projects for a specific profile"""
-        queryset = self.get_queryset().filter(profile__id=profile_id)
+    @action(detail=False, methods=['get'], url_path='by_user/(?P<user_id>[^/.]+)')
+    def by_user(self, request, user_id=None):
+        """Get all projects for a specific user"""
+        queryset = self.get_queryset().filter(user__id=user_id)
         
         page = self.paginate_queryset(queryset)
         if page is not None:

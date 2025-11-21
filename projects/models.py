@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import URLValidator
+from django.conf import settings
 import uuid
 
 
@@ -8,8 +9,8 @@ class Project(models.Model):
     Portfolio projects
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    profile = models.ForeignKey(
-        'profiles.Profile',
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='projects'
     )

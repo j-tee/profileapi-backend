@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 import uuid
 
 
@@ -28,8 +29,8 @@ class Skill(models.Model):
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    profile = models.ForeignKey(
-        'profiles.Profile',
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='skills'
     )
@@ -52,7 +53,7 @@ class Skill(models.Model):
     
     class Meta:
         ordering = ['category', 'order', '-proficiency_level']
-        unique_together = ['profile', 'name']
+        unique_together = ['user', 'name']
         verbose_name = 'Skill'
         verbose_name_plural = 'Skills'
     

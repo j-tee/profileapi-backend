@@ -22,10 +22,10 @@ class CertificationViewSet(viewsets.ModelViewSet):
     Public access for viewing (GET)
     Authentication required for create/update/delete
     """
-    queryset = Certification.objects.select_related('profile').all()
+    queryset = Certification.objects.select_related('user').all()
     permission_classes = [IsAuthenticatedOrReadOnly, IsSuperAdminOrEditor]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['profile', 'issuer']
+    filterset_fields = ['user', 'issuer']
     search_fields = ['name', 'issuer', 'description', 'skills']
     ordering_fields = ['issue_date', 'created_at', 'order', 'name']
     ordering = ['-issue_date', 'order']
@@ -44,10 +44,10 @@ class CertificationViewSet(viewsets.ModelViewSet):
             return [IsSuperAdminOrEditor()]
         return [IsAuthenticatedOrReadOnly()]
     
-    @action(detail=False, methods=['get'], url_path='by_profile/(?P<profile_id>[^/.]+)')
-    def by_profile(self, request, profile_id=None):
-        """Get all certifications for a specific profile"""
-        queryset = self.get_queryset().filter(profile__id=profile_id)
+    @action(detail=False, methods=['get'], url_path='by_user/(?P<user_id>[^/.]+)')
+    def by_user(self, request, user_id=None):
+        """Get all certifications for a specific user"""
+        queryset = self.get_queryset().filter(user__id=user_id)
         
         page = self.paginate_queryset(queryset)
         if page is not None:

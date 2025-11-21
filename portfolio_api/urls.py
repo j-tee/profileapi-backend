@@ -40,7 +40,6 @@ urlpatterns = [
     # API endpoints
     path('api/auth/', include('accounts.urls')),
     path('api/contacts/', include('contacts.urls')),
-    path('api/', include('profiles.urls')),
     path('api/projects/', include('projects.urls')),
     path('api/experiences/', include('experiences.urls')),
     path('api/education/', include('education.urls')),

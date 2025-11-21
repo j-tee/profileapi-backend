@@ -20,10 +20,10 @@ class ExperienceViewSet(viewsets.ModelViewSet):
     Public access for viewing (GET)
     Authentication required for create/update/delete
     """
-    queryset = Experience.objects.select_related('profile').all()
+    queryset = Experience.objects.select_related('user').all()
     permission_classes = [IsAuthenticatedOrReadOnly, IsSuperAdminOrEditor]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['profile', 'employment_type', 'location_type', 'current']
+    filterset_fields = ['user', 'employment_type', 'location_type', 'current']
     search_fields = ['title', 'company', 'description', 'technologies']
     ordering_fields = ['start_date', 'created_at', 'order', 'company']
     ordering = ['-start_date', 'order']
@@ -42,10 +42,10 @@ class ExperienceViewSet(viewsets.ModelViewSet):
             return [IsSuperAdminOrEditor()]
         return [IsAuthenticatedOrReadOnly()]
     
-    @action(detail=False, methods=['get'], url_path='by_profile/(?P<profile_id>[^/.]+)')
-    def by_profile(self, request, profile_id=None):
-        """Get all experiences for a specific profile"""
-        queryset = self.get_queryset().filter(profile__id=profile_id)
+    @action(detail=False, methods=['get'], url_path='by_user/(?P<user_id>[^/.]+)')
+    def by_user(self, request, user_id=None):
+        """Get all experiences for a specific user"""
+        queryset = self.get_queryset().filter(user__id=user_id)
         
         page = self.paginate_queryset(queryset)
         if page is not None:

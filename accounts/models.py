@@ -95,6 +95,38 @@ class User(AbstractUser):
         help_text="List of backup codes for MFA recovery"
     )
     
+    # Portfolio/Profile fields
+    headline = models.CharField(
+        max_length=255,
+        blank=True,
+        default='',
+        help_text="Professional headline or tagline"
+    )
+    summary = models.TextField(
+        blank=True,
+        default='',
+        help_text="Professional summary or bio"
+    )
+    
+    # Location
+    city = models.CharField(max_length=100, blank=True, default='')
+    state = models.CharField(max_length=100, blank=True, default='')
+    country = models.CharField(max_length=100, blank=True, default='')
+    
+    # Profile Images
+    profile_picture = models.ImageField(
+        upload_to='profiles/pictures/',
+        blank=True,
+        null=True,
+        help_text="Profile picture"
+    )
+    cover_image = models.ImageField(
+        upload_to='profiles/covers/',
+        blank=True,
+        null=True,
+        help_text="Cover/banner image"
+    )
+    
     # Tracking
     last_login_ip = models.GenericIPAddressField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -207,3 +239,34 @@ class UserActivity(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.action} at {self.timestamp}"
+
+
+class SocialLink(models.Model):
+    """
+    Social media and portfolio links
+    """
+    PLATFORM_CHOICES = [
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('twitter', 'Twitter'),
+        ('portfolio', 'Portfolio'),
+        ('other', 'Other'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='social_links'
+    )
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    url = models.URLField()
+    display_name = models.CharField(max_length=100, blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order', 'platform']
+        unique_together = ['user', 'platform', 'url']
+    
+    def __str__(self):
+        return f"{self.user.full_name} - {self.get_platform_display()}"

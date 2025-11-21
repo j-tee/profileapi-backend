@@ -83,20 +83,21 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
     images = ProjectImageSerializer(many=True, read_only=True)
     duration = serializers.SerializerMethodField()
     technologies_count = serializers.SerializerMethodField()
-    profile_name = serializers.SerializerMethodField()
+    owner_name = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
     video_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Project
         fields = [
-            'id', 'profile', 'profile_name', 'title', 'description', 
+            'id', 'user', 'owner_name', 'owner_email', 'title', 'description', 
             'long_description', 'technologies', 'technologies_count',
             'role', 'team_size', 'start_date', 'end_date', 'current',
             'project_url', 'github_url', 'demo_url', 'video', 'video_url',
             'highlights', 'challenges', 'outcomes', 'featured', 'order',
             'images', 'duration', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'profile_name', 'video_url']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'owner_name', 'owner_email', 'video_url']
     
     def get_duration(self, obj):
         """Calculate project duration"""
@@ -124,10 +125,16 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         """Count of technologies"""
         return len(obj.technologies) if obj.technologies else 0
     
-    def get_profile_name(self, obj):
-        """Get profile owner name"""
-        if obj.profile:
-            return obj.profile.full_name
+    def get_owner_name(self, obj):
+        """Get project owner name"""
+        if obj.user:
+            return obj.user.get_full_name()
+        return None
+    
+    def get_owner_email(self, obj):
+        """Get project owner email"""
+        if obj.user:
+            return obj.user.email
         return None
     
     def get_video_url(self, obj):
@@ -146,7 +153,7 @@ class ProjectCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = [
-            'profile', 'title', 'description', 'long_description',
+            'user', 'title', 'description', 'long_description',
             'technologies', 'role', 'team_size', 'start_date',
             'end_date', 'current', 'project_url', 'github_url',
             'demo_url', 'highlights', 'challenges', 'outcomes',

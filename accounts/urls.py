@@ -5,6 +5,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'users', views.UserViewSet, basename='user')
+router.register(r'social-links', views.SocialLinkViewSet, basename='social-link')
 
 urlpatterns = [
     # Authentication endpoints
@@ -26,6 +27,6 @@ urlpatterns = [
     # User activity logs
     path('activity/', views.UserActivityListView.as_view(), name='user-activity'),
     
-    # User management (admin only)
+    # User management (admin only) and social links
     path('', include(router.urls)),
 ]

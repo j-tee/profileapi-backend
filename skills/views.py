@@ -21,10 +21,10 @@ class SkillViewSet(viewsets.ModelViewSet):
     Public access for viewing (GET)
     Authentication required for create/update/delete
     """
-    queryset = Skill.objects.select_related('profile').all()
+    queryset = Skill.objects.select_related('user').all()
     permission_classes = [IsAuthenticatedOrReadOnly, IsSuperAdminOrEditor]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['profile', 'category', 'proficiency_level']
+    filterset_fields = ['user', 'category', 'proficiency_level']
     search_fields = ['name']
     ordering_fields = ['name', 'category', 'proficiency_level', 'years_of_experience', 'endorsements', 'order']
     ordering = ['category', 'order', '-proficiency_level']
@@ -43,10 +43,10 @@ class SkillViewSet(viewsets.ModelViewSet):
             return [IsSuperAdminOrEditor()]
         return [IsAuthenticatedOrReadOnly()]
     
-    @action(detail=False, methods=['get'], url_path='by_profile/(?P<profile_id>[^/.]+)')
-    def by_profile(self, request, profile_id=None):
-        """Get all skills for a specific profile"""
-        queryset = self.get_queryset().filter(profile__id=profile_id)
+    @action(detail=False, methods=['get'], url_path='by_user/(?P<user_id>[^/.]+)')
+    def by_user(self, request, user_id=None):
+        """Get all skills for a specific user"""
+        queryset = self.get_queryset().filter(user__id=user_id)
         
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -62,11 +62,11 @@ class SkillViewSet(viewsets.ModelViewSet):
         categories = Skill.CATEGORY_CHOICES
         result = {}
         
-        profile_id = request.query_params.get('profile')
+        user_id = request.query_params.get('user')
         queryset = self.get_queryset()
         
-        if profile_id:
-            queryset = queryset.filter(profile__id=profile_id)
+        if user_id:
+            queryset = queryset.filter(user__id=user_id)
         
         for category_code, category_name in categories:
             skills = queryset.filter(category=category_code)

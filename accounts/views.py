@@ -12,12 +12,12 @@ import qrcode
 import io
 import base64
 
-from .models import User, UserActivity, UserRole
+from .models import User, UserActivity, UserRole, SocialLink
 from .serializers import (
     UserRegistrationSerializer, LoginSerializer, UserSerializer,
     UserListSerializer, UserUpdateSerializer, UserRoleUpdateSerializer,
     MFASetupSerializer, MFAVerifySerializer, MFADisableSerializer,
-    PasswordChangeSerializer, UserActivitySerializer
+    PasswordChangeSerializer, UserActivitySerializer, SocialLinkSerializer
 )
 from portfolio_api.permissions import IsSuperAdmin
 
@@ -116,26 +116,6 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         response = super().update(request, *args, **kwargs)
         log_user_activity(request.user, 'PROFILE_UPDATED', request)
         return response
-
-
-
-    
-    def post(self, request):
-        """Create or ensure profile exists for current user"""
-        from profiles.models import Profile
-        from profiles.serializers import ProfileDetailSerializer
-        
-        # Ensure profile exists
-        profile = ensure_user_has_profile(request.user)
-        
-        log_user_activity(request.user, 'PROFILE_ACCESSED', request)
-        
-        serializer = ProfileDetailSerializer(profile, context={'request': request})
-        return Response({
-            'message': 'Profile ready',
-            'profile': serializer.data,
-            'profile_status': profile.completion_status()
-        }, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -362,3 +342,22 @@ class UserActivityListView(generics.ListAPIView):
             queryset = UserActivity.objects.filter(user=user)
         
         return queryset
+
+
+class SocialLinkViewSet(viewsets.ModelViewSet):
+    """Manage user social links"""
+    serializer_class = SocialLinkSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        # Users can only see their own social links
+        return SocialLink.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Ensure users can only update their own links
+        if serializer.instance.user != self.request.user:
+            raise PermissionError("Cannot update another user's social link")
+        serializer.save()

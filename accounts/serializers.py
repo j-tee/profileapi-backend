@@ -111,18 +111,74 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+class SocialLinkSerializer(serializers.ModelSerializer):
+    """Serializer for social media links"""
+    platform_display = serializers.CharField(source='get_platform_display', read_only=True)
+    
+    class Meta:
+        from accounts.models import SocialLink
+        model = SocialLink
+        fields = ['id', 'platform', 'platform_display', 'url', 'display_name', 'order']
+        read_only_fields = ['id']
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for user details"""
     full_name = serializers.CharField(read_only=True)
+    profile_picture_url = serializers.SerializerMethodField()
+    cover_image_url = serializers.SerializerMethodField()
+    social_links = SocialLinkSerializer(many=True, read_only=True)
+    
+    # Count related items
+    projects_count = serializers.SerializerMethodField()
+    experiences_count = serializers.SerializerMethodField()
+    education_count = serializers.SerializerMethodField()
+    skills_count = serializers.SerializerMethodField()
+    certifications_count = serializers.SerializerMethodField()
     
     class Meta:
         model = User
         fields = [
             'id', 'email', 'first_name', 'last_name', 'full_name',
-            'phone', 'role', 'is_verified', 'is_active',
-            'mfa_enabled', 'created_at', 'updated_at'
+            'phone', 'role', 'is_verified', 'is_active', 'mfa_enabled',
+            'headline', 'summary', 'city', 'state', 'country',
+            'profile_picture', 'profile_picture_url',
+            'cover_image', 'cover_image_url',
+            'social_links',
+            'projects_count', 'experiences_count', 'education_count',
+            'skills_count', 'certifications_count',
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'email', 'role', 'is_verified', 'created_at', 'updated_at']
+    
+    def get_profile_picture_url(self, obj):
+        if obj.profile_picture:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.profile_picture.url)
+        return None
+    
+    def get_cover_image_url(self, obj):
+        if obj.cover_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.cover_image.url)
+        return None
+    
+    def get_projects_count(self, obj):
+        return obj.projects.count()
+    
+    def get_experiences_count(self, obj):
+        return obj.experiences.count()
+    
+    def get_education_count(self, obj):
+        return obj.education.count()
+    
+    def get_skills_count(self, obj):
+        return obj.skills.count()
+    
+    def get_certifications_count(self, obj):
+        return obj.certifications.count()
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -143,7 +199,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone']
+        fields = [
+            'first_name', 'last_name', 'phone',
+            'headline', 'summary', 'city', 'state', 'country',
+            'profile_picture', 'cover_image'
+        ]
 
 
 class UserRoleUpdateSerializer(serializers.Serializer):

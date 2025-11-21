@@ -51,21 +51,22 @@ class ExperienceListSerializer(serializers.ModelSerializer):
 class ExperienceDetailSerializer(serializers.ModelSerializer):
     """Serializer for experience details (complete data)"""
     duration = serializers.SerializerMethodField()
-    profile_name = serializers.SerializerMethodField()
+    owner_name = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
     employment_type_display = serializers.CharField(source='get_employment_type_display', read_only=True)
     location_type_display = serializers.CharField(source='get_location_type_display', read_only=True)
     
     class Meta:
         model = Experience
         fields = [
-            'id', 'profile', 'profile_name', 'title', 'company',
+            'id', 'user', 'owner_name', 'owner_email', 'title', 'company',
             'employment_type', 'employment_type_display', 'location',
             'location_type', 'location_type_display', 'start_date',
             'end_date', 'current', 'description', 'responsibilities',
             'achievements', 'technologies', 'order', 'duration',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'profile_name']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'owner_name', 'owner_email']
     
     def get_duration(self, obj):
         """Calculate experience duration"""
@@ -89,10 +90,16 @@ class ExperienceDetailSerializer(serializers.ModelSerializer):
                 return f"{years} year{'s' if years > 1 else ''} {remaining_months} month{'s' if remaining_months > 1 else ''}"
         return None
     
-    def get_profile_name(self, obj):
-        """Get profile owner name"""
-        if obj.profile:
-            return obj.profile.full_name
+    def get_owner_name(self, obj):
+        """Get experience owner name"""
+        if obj.user:
+            return obj.user.get_full_name()
+        return None
+    
+    def get_owner_email(self, obj):
+        """Get experience owner email"""
+        if obj.user:
+            return obj.user.email
         return None
 
 
@@ -102,7 +109,7 @@ class ExperienceCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Experience
         fields = [
-            'profile', 'title', 'company', 'employment_type', 'location',
+            'user', 'title', 'company', 'employment_type', 'location',
             'location_type', 'start_date', 'end_date', 'current',
             'description', 'responsibilities', 'achievements',
             'technologies', 'order'
