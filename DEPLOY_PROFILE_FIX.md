@@ -131,7 +131,7 @@ curl -X POST https://profileapi.alphalogiquetechnologies.com/api/auth/login/ \
   }'
 ```
 
-Expected response should include:
+Expected response should include the new `profile_status` block:
 ```json
 {
   "message": "Login successful",
@@ -140,9 +140,21 @@ Expected response should include:
     "id": "some-uuid",
     "email": "your-email@example.com",
     "full_name": "Your Name",
-    "headline": "Your Portfolio - Please update your profile",
-    "is_complete": false
+    "headline": "Your Portfolio - Please update your profile"
   },
+  "profile_status": {
+    "is_complete": false,
+    "needs_update": true,
+    "missing_fields": [
+      "headline",
+      "summary",
+      "city",
+      "state",
+      "country"
+    ],
+    "summary_min_length": 50
+  },
+  "requires_profile_update": true,
   "tokens": {...}
 }
 ```
@@ -160,16 +172,24 @@ Authorization: Bearer <access_token>
 Response:
 ```json
 {
-  "id": "uuid",
-  "email": "user@example.com",
-  "first_name": "John",
-  "last_name": "Doe",
-  "headline": "Full Stack Developer",
-  "summary": "...",
-  "city": "Accra",
-  "state": "Greater Accra",
-  "country": "Ghana",
-  ...
+  "profile": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "first_name": "John",
+    "last_name": "Doe",
+    "headline": "Full Stack Developer",
+    "summary": "...",
+    "city": "Accra",
+    "state": "Greater Accra",
+    "country": "Ghana",
+    ...
+  },
+  "profile_status": {
+    "is_complete": false,
+    "needs_update": true,
+    "missing_fields": ["city"],
+    "summary_min_length": 50
+  }
 }
 ```
 
@@ -183,8 +203,12 @@ Response includes completion status:
 ```json
 {
   "profile": {...},
-  "is_complete": false,
-  "needs_update": true
+  "profile_status": {
+    "is_complete": false,
+    "needs_update": true,
+    "missing_fields": ["summary", "city"],
+    "summary_min_length": 50
+  }
 }
 ```
 
@@ -231,7 +255,7 @@ async function login(email: string, password: string) {
     localStorage.setItem('profile', JSON.stringify(data.profile));
     
     // Check if profile needs update
-    if (!data.profile.is_complete) {
+    if (data.profile_status?.needs_update) {
       // Redirect to profile completion page
       router.push('/complete-profile');
     } else {
@@ -274,7 +298,7 @@ export default function CompleteProfile() {
     
     const data = await response.json();
     
-    if (data.needs_update) {
+    if (data.profile_status?.needs_update) {
       // Show profile completion form
       setProfile(data.profile);
       setFormData({
@@ -312,7 +336,7 @@ export default function CompleteProfile() {
     if (response.ok) {
       alert('Profile updated successfully!');
       
-      if (data.is_complete) {
+      if (!data.profile_status?.needs_update) {
         // Profile is now complete, go to dashboard
         window.location.href = '/dashboard';
       }
@@ -470,8 +494,9 @@ export default function ProtectedRoute({ children }) {
       );
       
       const data = await response.json();
+      const needsUpdate = data.profile_status?.needs_update;
       
-      if (data.needs_update && router.pathname !== '/complete-profile') {
+      if (needsUpdate && router.pathname !== '/complete-profile') {
         // Redirect to profile completion if needed
         router.push('/complete-profile');
       } else {
@@ -502,13 +527,13 @@ export default function ProtectedRoute({ children }) {
 
 ### 2. Test Profile Completion
 - Navigate to `/api/profiles/me/` endpoint
-- Check `needs_update` field
+- Check `profile_status.needs_update`
 - If true, show profile completion form
 
 ### 3. Test Profile Update
 - Submit profile completion form
 - Verify update succeeds
-- Check `is_complete` becomes true
+- Check `profile_status.is_complete` becomes true
 
 ---
 
@@ -573,7 +598,7 @@ sudo nano /var/www/portfolio/backend/.env.production
 
 1. **User logs in** → Profile auto-created if doesn't exist
 2. **Backend returns profile** with `is_complete` status
-3. **Frontend checks** if `needs_update === true`
+3. **Frontend checks** if `profile_status.needs_update === true`
 4. **If true** → Show profile completion form
 5. **User fills form** → Submit to `/api/profiles/me/`
 6. **Profile updated** → `is_complete` becomes true

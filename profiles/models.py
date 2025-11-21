@@ -48,16 +48,38 @@ class Profile(models.Model):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
     
+    SUMMARY_MIN_LENGTH = 50
+    REQUIRED_FIELDS = ['headline', 'summary', 'city', 'state', 'country']
+    
     @property
     def is_complete(self):
-        """Check if profile has all required information filled out"""
-        return bool(
-            self.city and 
-            self.state and 
-            self.country and 
-            self.headline and 
-            len(self.summary) > 50  # At least 50 chars in summary
-        )
+        """Profile is complete only when no required fields are missing"""
+        return not self.missing_required_fields()
+    
+    def missing_required_fields(self):
+        """Return list of required fields that still need user input"""
+        missing = []
+        if not self.headline:
+            missing.append('headline')
+        if not self.summary or len(self.summary.strip()) < self.SUMMARY_MIN_LENGTH:
+            missing.append('summary')
+        if not self.city:
+            missing.append('city')
+        if not self.state:
+            missing.append('state')
+        if not self.country:
+            missing.append('country')
+        return missing
+    
+    def completion_status(self):
+        """Convenient structure for API responses"""
+        missing = self.missing_required_fields()
+        return {
+            'is_complete': not missing,
+            'needs_update': bool(missing),
+            'missing_fields': missing,
+            'summary_min_length': self.SUMMARY_MIN_LENGTH
+        }
 
 
 class SocialLink(models.Model):

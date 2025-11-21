@@ -141,8 +141,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             serializer = ProfileDetailSerializer(profile, context={'request': request})
             return Response({
                 'profile': serializer.data,
-                'is_complete': profile.is_complete,
-                'needs_update': not profile.is_complete
+                'profile_status': profile.completion_status()
             })
         
         # PATCH or PUT - update profile
@@ -158,7 +157,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Response({
                 'message': 'Profile updated successfully',
                 'profile': ProfileDetailSerializer(profile, context={'request': request}).data,
-                'is_complete': profile.is_complete
+                'profile_status': profile.completion_status()
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
