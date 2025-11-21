@@ -42,16 +42,17 @@ class ProfileViewSet(viewsets.ModelViewSet):
         return [IsAuthenticatedOrReadOnly()]
     
     def get_queryset(self):
-        queryset = Profile.objects.all()
+        queryset = Profile.objects.select_related('user').prefetch_related('social_links')
         
-        # Search by name or email
+        # Search by headline or location
         search = self.request.query_params.get('search')
         if search:
             queryset = queryset.filter(
-                Q(first_name__icontains=search) |
-                Q(last_name__icontains=search) |
-                Q(email__icontains=search) |
-                Q(headline__icontains=search)
+                Q(headline__icontains=search) |
+                Q(summary__icontains=search) |
+                Q(city__icontains=search) |
+                Q(state__icontains=search) |
+                Q(country__icontains=search)
             )
         
         # Filter by location
@@ -67,7 +68,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         if country:
             queryset = queryset.filter(country__icontains=country)
         
-        return queryset.select_related().prefetch_related('social_links')
+        return queryset
     
     @action(detail=True, methods=['get'])
     def social_links(self, request, pk=None):
@@ -109,58 +110,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
     
-    @action(detail=False, methods=['get'])
-    def by_email(self, request):
-        """Get profile by email"""
-        email = request.query_params.get('email')
-        if not email:
-            return Response(
-                {'error': 'Email parameter is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            profile = Profile.objects.get(email=email)
-            serializer = self.get_serializer(profile)
-            return Response(serializer.data)
-        except Profile.DoesNotExist:
-            return Response(
-                {'error': 'Profile not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-    
-    @action(detail=False, methods=['get', 'patch', 'put'], permission_classes=[IsAuthenticated])
-    def me(self, request):
-        """Get or update the authenticated user's own profile"""
-        from accounts.signals import ensure_user_has_profile
-        
-        # Ensure profile exists for current user
-        profile = ensure_user_has_profile(request.user)
-        
-        if request.method == 'GET':
-            serializer = ProfileDetailSerializer(profile, context={'request': request})
-            return Response({
-                'profile': serializer.data,
-                'profile_status': profile.completion_status()
-            })
-        
-        # PATCH or PUT - update profile
-        serializer = ProfileCreateUpdateSerializer(
-            profile, 
-            data=request.data, 
-            partial=(request.method == 'PATCH'),
-            context={'request': request}
-        )
-        
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'message': 'Profile updated successfully',
-                'profile': ProfileDetailSerializer(profile, context={'request': request}).data,
-                'profile_status': profile.completion_status()
-            })
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class SocialLinkViewSet(viewsets.ModelViewSet):

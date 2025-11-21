@@ -16,15 +16,16 @@ class SocialLinkSerializer(serializers.ModelSerializer):
 
 
 class ProfileListSerializer(serializers.ModelSerializer):
-    """Serializer for profile list view"""
-    full_name = serializers.CharField(read_only=True)
+    """Serializer for portfolio profile list view"""
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
     profile_picture_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
         fields = [
-            'id', 'full_name', 'first_name', 'last_name', 
-            'headline', 'email', 'city', 'state', 'country',
+            'id', 'full_name', 'email', 'headline', 
+            'city', 'state', 'country',
             'profile_picture_url', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
@@ -38,8 +39,10 @@ class ProfileListSerializer(serializers.ModelSerializer):
 
 
 class ProfileDetailSerializer(serializers.ModelSerializer):
-    """Serializer for profile detail view"""
-    full_name = serializers.CharField(read_only=True)
+    """Serializer for portfolio profile detail view"""
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    phone = serializers.CharField(source='user.phone', read_only=True)
     social_links = SocialLinkSerializer(many=True, read_only=True)
     profile_picture_url = serializers.SerializerMethodField()
     cover_image_url = serializers.SerializerMethodField()
@@ -54,8 +57,8 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
-            'id', 'first_name', 'last_name', 'full_name',
-            'headline', 'summary', 'email', 'phone',
+            'id', 'full_name', 'email', 'phone',
+            'headline', 'summary',
             'city', 'state', 'country',
             'profile_picture', 'profile_picture_url',
             'cover_image', 'cover_image_url',
@@ -64,7 +67,7 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
             'skills_count', 'certifications_count',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'full_name', 'email', 'phone', 'created_at', 'updated_at']
     
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
@@ -97,22 +100,15 @@ class ProfileDetailSerializer(serializers.ModelSerializer):
 
 
 class ProfileCreateUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for creating/updating profiles"""
+    """Serializer for creating/updating portfolio profiles"""
     
     class Meta:
         model = Profile
         fields = [
-            'first_name', 'last_name', 'headline', 'summary',
-            'email', 'phone', 'city', 'state', 'country',
+            'headline', 'summary',
+            'city', 'state', 'country',
             'profile_picture', 'cover_image'
         ]
-    
-    def validate_email(self, value):
-        """Ensure email is unique"""
-        profile_id = self.instance.id if self.instance else None
-        if Profile.objects.filter(email=value).exclude(id=profile_id).exists():
-            raise serializers.ValidationError("A profile with this email already exists.")
-        return value
 
 
 class SocialLinkCreateUpdateSerializer(serializers.ModelSerializer):
