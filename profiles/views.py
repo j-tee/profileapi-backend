@@ -128,6 +128,40 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 {'error': 'Profile not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+    
+    @action(detail=False, methods=['get', 'patch', 'put'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        """Get or update the authenticated user's own profile"""
+        from accounts.signals import ensure_user_has_profile
+        
+        # Ensure profile exists for current user
+        profile = ensure_user_has_profile(request.user)
+        
+        if request.method == 'GET':
+            serializer = ProfileDetailSerializer(profile, context={'request': request})
+            return Response({
+                'profile': serializer.data,
+                'is_complete': profile.is_complete,
+                'needs_update': not profile.is_complete
+            })
+        
+        # PATCH or PUT - update profile
+        serializer = ProfileCreateUpdateSerializer(
+            profile, 
+            data=request.data, 
+            partial=(request.method == 'PATCH'),
+            context={'request': request}
+        )
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Profile updated successfully',
+                'profile': ProfileDetailSerializer(profile, context={'request': request}).data,
+                'is_complete': profile.is_complete
+            })
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SocialLinkViewSet(viewsets.ModelViewSet):

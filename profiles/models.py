@@ -16,9 +16,9 @@ class Profile(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     
     # Location
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, blank=True, default='')
+    state = models.CharField(max_length=100, blank=True, default='')
+    country = models.CharField(max_length=100, blank=True, default='')
     
     # Images
     profile_picture = models.ImageField(
@@ -47,6 +47,17 @@ class Profile(models.Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+    @property
+    def is_complete(self):
+        """Check if profile has all required information filled out"""
+        return bool(
+            self.city and 
+            self.state and 
+            self.country and 
+            self.headline and 
+            len(self.summary) > 50  # At least 50 chars in summary
+        )
 
 
 class SocialLink(models.Model):

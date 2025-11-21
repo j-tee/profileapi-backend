@@ -40,14 +40,15 @@ def ensure_user_has_profile(user):
     profile, created = Profile.objects.get_or_create(
         email=user.email,
         defaults={
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'headline': f"{user.full_name}'s Portfolio",
+            'first_name': user.first_name or 'User',
+            'last_name': user.last_name or '',
+            'headline': f"{user.full_name}'s Portfolio - Please update your profile",
             'summary': f"Welcome to {user.full_name}'s professional portfolio. "
-                      f"Update this section to showcase your skills and experience.",
-            'city': "",
-            'state': "",
-            'country': ""
+                      f"Please update this section to showcase your skills, experience, and achievements. "
+                      f"Tell visitors about your background, expertise, and what makes you unique.",
+            'city': '',
+            'state': '',
+            'country': ''
         }
     )
     
