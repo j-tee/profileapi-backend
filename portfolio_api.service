@@ -1,0 +1,23 @@
+[Unit]
+Description=Gunicorn daemon for Portfolio API
+After=network.target
+
+[Service]
+Type=notify
+User=deploy
+Group=deploy
+WorkingDirectory=/var/www/portfolio/backend
+Environment="PATH=/var/www/portfolio/backend/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=portfolio_api.settings"
+ExecStart=/var/www/portfolio/backend/venv/bin/gunicorn \
+    --config /var/www/portfolio/backend/gunicorn_config.py \
+    --env DJANGO_SETTINGS_MODULE=portfolio_api.settings \
+    portfolio_api.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

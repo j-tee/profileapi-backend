@@ -20,6 +20,7 @@ from .serializers import (
     PasswordChangeSerializer, UserActivitySerializer
 )
 from portfolio_api.permissions import IsSuperAdmin
+from .signals import ensure_user_has_profile
 
 User = get_user_model()
 
@@ -87,11 +88,21 @@ class LoginView(generics.GenericAPIView):
         
         log_user_activity(user, 'USER_LOGIN', request)
         
+        # Ensure user has a profile (create if doesn't exist)
+        profile = ensure_user_has_profile(user)
+        
         refresh = RefreshToken.for_user(user)
         
         return Response({
             'message': 'Login successful',
             'user': UserSerializer(user).data,
+            'profile': {
+                'id': str(profile.id),
+                'email': profile.email,
+                'full_name': profile.full_name,
+                'headline': profile.headline,
+                'is_complete': bool(profile.city and profile.state and profile.country)
+            },
             'tokens': {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
@@ -116,6 +127,38 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         response = super().update(request, *args, **kwargs)
         log_user_activity(request.user, 'PROFILE_UPDATED', request)
         return response
+
+
+class UserPortfolioProfileView(generics.GenericAPIView):
+    """Get the portfolio profile associated with the authenticated user"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """Get user's portfolio profile"""
+        from profiles.models import Profile
+        from profiles.serializers import ProfileDetailSerializer
+        
+        # Ensure profile exists
+        profile = ensure_user_has_profile(request.user)
+        
+        serializer = ProfileDetailSerializer(profile, context={'request': request})
+        return Response(serializer.data)
+    
+    def post(self, request):
+        """Create or ensure profile exists for current user"""
+        from profiles.models import Profile
+        from profiles.serializers import ProfileDetailSerializer
+        
+        # Ensure profile exists
+        profile = ensure_user_has_profile(request.user)
+        
+        log_user_activity(request.user, 'PROFILE_ACCESSED', request)
+        
+        serializer = ProfileDetailSerializer(profile, context={'request': request})
+        return Response({
+            'message': 'Profile ready',
+            'profile': serializer.data
+        }, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):

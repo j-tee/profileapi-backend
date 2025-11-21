@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio API - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            background: #f0fff4;
+            color: #22543d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .link-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 30px 20px;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .link-card .icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .link-card .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .link-card .description {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .info-section {
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .links-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">P</div>
+        <h1>Portfolio API</h1>
+        <p class="subtitle">Professional Portfolio Management System</p>
+        
+        <div class="status">
+            <span class="status-dot"></span>
+            <span>API is Online & Running</span>
+        </div>
+
+        <div class="links-grid">
+            <a href="/admin/" class="link-card">
+                <div class="icon">🔐</div>
+                <div class="title">Admin Portal</div>
+                <div class="description">Manage content & users</div>
+            </a>
+
+            <a href="/api/schema/swagger-ui/" class="link-card">
+                <div class="icon">📚</div>
+                <div class="title">API Docs</div>
+                <div class="description">Interactive documentation</div>
+            </a>
+
+            <a href="/api/" class="link-card">
+                <div class="icon">🚀</div>
+                <div class="title">API Explorer</div>
+                <div class="description">Browse all endpoints</div>
+            </a>
+
+            <a href="/api/schema/redoc/" class="link-card">
+                <div class="icon">📖</div>
+                <div class="title">ReDoc</div>
+                <div class="description">Alternative API docs</div>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <h2 style="color: #2d3748; margin-bottom: 20px;">Available Endpoints</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-value">8</div>
+                    <div class="info-label">Modules</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">REST</div>
+                    <div class="info-label">Architecture</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">JWT</div>
+                    <div class="info-label">Authentication</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">SSL</div>
+                    <div class="info-label">Secure</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>API Modules:</strong> Accounts, Profiles, Projects, Education, Experience, Skills, Certifications, Contact</p>
+            <p style="margin-top: 10px;">&copy; 2025 Portfolio API. Built with Django & Django REST Framework.</p>
+        </footer>
+    </div>
+</body>
+</html>

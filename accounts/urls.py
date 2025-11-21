@@ -14,6 +14,7 @@ urlpatterns = [
     
     # User profile
     path('profile/', views.UserProfileView.as_view(), name='user-profile'),
+    path('my-portfolio-profile/', views.UserPortfolioProfileView.as_view(), name='user-portfolio-profile'),
     
     # MFA endpoints
     path('mfa/setup/', views.MFASetupView.as_view(), name='mfa-setup'),
