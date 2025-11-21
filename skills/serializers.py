@@ -53,7 +53,7 @@ class SkillCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
         fields = [
-            'user', 'name', 'category', 'proficiency_level',
+            'name', 'category', 'proficiency_level',
             'years_of_experience', 'endorsements', 'order'
         ]
     

@@ -107,7 +107,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST
                 )
         
-        project = serializer.save(video=video if video else None)
+        # Auto-assign the authenticated user
+        project = serializer.save(user=request.user, video=video if video else None)
         
         # Handle multiple image uploads
         images = request.FILES.getlist('images')

@@ -87,7 +87,7 @@ class EducationCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Education
         fields = [
-            'user', 'institution', 'degree', 'field_of_study',
+            'institution', 'degree', 'field_of_study',
             'start_date', 'end_date', 'current', 'grade',
             'description', 'activities', 'achievements', 'order'
         ]

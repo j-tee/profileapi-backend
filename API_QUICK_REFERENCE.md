@@ -83,7 +83,6 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "user": "user_uuid",
   "title": "Project Name",
   "description": "Short description",
   "long_description": "Detailed description",
@@ -100,6 +99,8 @@ Content-Type: application/json
   "order": 0
 }
 ```
+
+**Note:** The `user` field is automatically assigned to the authenticated user.
 
 ## Experiences
 
@@ -125,7 +126,6 @@ POST /api/experiences/
 Authorization: Bearer <token>
 
 {
-  "user": "user_uuid",
   "title": "Senior Developer",
   "company": "Tech Corp",
   "employment_type": "full_time",
@@ -141,6 +141,8 @@ Authorization: Bearer <token>
   "order": 0
 }
 ```
+
+**Note:** The `user` field is automatically assigned to the authenticated user.
 
 ## Education
 
@@ -164,7 +166,6 @@ POST /api/education/
 Authorization: Bearer <token>
 
 {
-  "user": "user_uuid",
   "institution": "University Name",
   "degree": "Bachelor of Science",
   "field_of_study": "Computer Science",
@@ -178,6 +179,8 @@ Authorization: Bearer <token>
   "order": 0
 }
 ```
+
+**Note:** The `user` field is automatically assigned to the authenticated user.
 
 ## Skills
 
@@ -207,7 +210,6 @@ POST /api/skills/
 Authorization: Bearer <token>
 
 {
-  "user": "user_uuid",
   "name": "Python",
   "category": "programming",
   "proficiency_level": "expert",
@@ -216,6 +218,8 @@ Authorization: Bearer <token>
   "order": 0
 }
 ```
+
+**Note:** The `user` field is automatically assigned to the authenticated user.
 
 **Categories:**
 - `programming` - Programming Languages
@@ -260,7 +264,6 @@ POST /api/certifications/
 Authorization: Bearer <token>
 
 {
-  "user": "user_uuid",
   "name": "AWS Certified Solutions Architect",
   "issuer": "Amazon Web Services",
   "issue_date": "2023-06-01",
@@ -272,6 +275,8 @@ Authorization: Bearer <token>
   "order": 0
 }
 ```
+
+**Note:** The `user` field is automatically assigned to the authenticated user.
 
 ## Social Links
 

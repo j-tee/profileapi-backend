@@ -44,6 +44,10 @@ class CertificationViewSet(viewsets.ModelViewSet):
             return [IsSuperAdminOrEditor()]
         return [IsAuthenticatedOrReadOnly()]
     
+    def perform_create(self, serializer):
+        """Auto-assign authenticated user when creating"""
+        serializer.save(user=self.request.user)
+    
     @action(detail=False, methods=['get'], url_path='by_user/(?P<user_id>[^/.]+)')
     def by_user(self, request, user_id=None):
         """Get all certifications for a specific user"""

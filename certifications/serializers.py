@@ -58,7 +58,7 @@ class CertificationCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Certification
         fields = [
-            'user', 'name', 'issuer', 'issue_date',
+            'name', 'issuer', 'issue_date',
             'expiration_date', 'credential_id', 'credential_url',
             'description', 'skills', 'order'
         ]
